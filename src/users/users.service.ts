@@ -20,7 +20,7 @@ export class UsersService {
           const prize = await this.spinsService.create(existedUserWithSamePhone.id, level);
           return prize;
         } else {
-          const ThirdSpinFromTheEnd = new Date(existedUserWithSamePhone.spins[-3].date);
+          const ThirdSpinFromTheEnd = new Date(existedUserWithSamePhone.spins.at(-3).date);
           const lastWeekDate = new Date();
           lastWeekDate.setDate(lastWeekDate.getDate() - 7);
           if (ThirdSpinFromTheEnd < lastWeekDate) {
@@ -34,7 +34,7 @@ export class UsersService {
         throw new BadRequestException('Emails are not equal');
       }
     } else {
-      const existedUserWithSameEmail = await this.getUserByEmail(phone);
+      const existedUserWithSameEmail = await this.getUserByEmail(email);
       if (existedUserWithSameEmail)
         throw new BadRequestException('User with such email already exist');
       const user = await this.prismaService.user.create({
@@ -65,9 +65,23 @@ export class UsersService {
   }
 
   async getUserByPhone(phone: string) {
-    return await this.prismaService.user.findUnique({ where: { phone }, include: { spins: true } });
+    try {
+      return await this.prismaService.user.findUnique({
+        where: { phone },
+        include: { spins: true },
+      });
+    } catch (_) {
+      return null;
+    }
   }
   async getUserByEmail(email: string) {
-    return await this.prismaService.user.findUnique({ where: { email } });
+    try {
+      return await this.prismaService.user.findUnique({
+        where: { email },
+        include: { spins: true },
+      });
+    } catch (_) {
+      return null;
+    }
   }
 }
