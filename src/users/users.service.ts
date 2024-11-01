@@ -52,6 +52,23 @@ export class UsersService {
     });
   }
 
+  async getLeaders() {
+    const leaders = await this.prismaService.user.findMany({
+      include: { spins: { select: { prizeId: true } } },
+      orderBy: { spins: { _count: 'desc' } },
+      take: 30,
+    });
+    const formattedLeaders = leaders.map(({ spins, name, phone, id }) => {
+      return {
+        prizeId: spins.at(-1).prizeId,
+        name,
+        id,
+        phone: phone.slice(0, 8) + ' ***-**-**',
+      };
+    });
+    return formattedLeaders;
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
