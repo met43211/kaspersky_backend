@@ -1,0 +1,39 @@
+networks:
+  kaspersky-symphony:
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+    env_file:
+      - .env
+    ports:
+      - 4000:4000
+    command: sh -c "npx prisma generate && npx prisma migrate dev && npm run start:prod"
+    depends_on:
+      - postgres
+    restart: always
+    networks:
+      - kaspersky-symphony
+
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD: kaspersky_password
+      POSTGRES_USER: kaspersky
+      POSTGRES_DB: kaspersky_db
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - kaspersky-symphony
+
+volumes:
+  pgdata:
