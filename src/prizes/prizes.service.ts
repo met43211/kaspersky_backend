@@ -27,8 +27,6 @@ export class PrizesService {
       }
     });
 
-    console.log(weightedPrizes);
-
     if (weightedPrizes.length === 0) return null;
 
     const randomIndex = Math.floor(Math.random() * weightedPrizes.length);
