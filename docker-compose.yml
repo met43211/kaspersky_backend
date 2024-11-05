@@ -35,7 +35,7 @@ services:
     networks:
       - kaspersky-symphony
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kaspersky"]
+      test: ['CMD-SHELL', 'pg_isready -U kaspersky']
       interval: 5s
       timeout: 5s
       retries: 5
