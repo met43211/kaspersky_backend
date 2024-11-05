@@ -15,7 +15,7 @@ export class SpinsService {
   async create(userId: number, prizeType: EPrizesTypes) {
     const date = new Date().toISOString();
     const prize = await this.prizesService.getPrizeByPrizeType(prizeType);
-    if (!prize) throw new InternalServerErrorException('Can not chose prize');
+    if (!prize) throw new InternalServerErrorException('Can not choose prize');
     await this.prizesService.subtractPrize(prize.itemId);
     const spin = await this.prismaService.spin.create({
       data: { prizeId: prize.itemId, userId, date },
