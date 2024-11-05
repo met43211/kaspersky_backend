@@ -22,4 +22,4 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh ${{ vars.SERVER_USER }}@${{ vars.SERVER_IP }} 'cd ~/kaspersky_backend && docker compose down && docker compose build && docker compose up -d'
+          ssh ${{ vars.SERVER_USER }}@${{ vars.SERVER_IP }} 'cd ~/kaspersky_backend && docker compose down && git pull && docker compose build && docker compose up -d'
