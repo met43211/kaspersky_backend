@@ -1,0 +1,25 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - prod
+  pull_request:
+    branches:
+      - prod
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ vars.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh ${{ vars.SERVER_USER }}@${{ vars.SERVER_IP }} 'cd ~/kaspersky_backend && docker compose down && docker compose build && docker compose up -d'
