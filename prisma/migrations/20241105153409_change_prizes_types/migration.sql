@@ -1,14 +1,24 @@
-/*
-  Warnings:
-
-  - The values [Security,MDR,EDR,XDR] on the enum `PrizeTypes` will be removed. If these variants are still used in the database, this will fail.
-
-*/
--- AlterEnum
 BEGIN;
+
+-- 1. Создаем новый тип перечисления с новыми значениями
 CREATE TYPE "PrizeTypes_new" AS ENUM ('security', 'mdr', 'edr', 'xdr');
-ALTER TABLE "prizes" ALTER COLUMN "type" TYPE "PrizeTypes_new" USING ("type"::text::"PrizeTypes_new");
-ALTER TYPE "PrizeTypes" RENAME TO "PrizeTypes_old";
+
+-- 2. Изменяем столбец с использованием нового типа перечисления
+ALTER TABLE "prizes" 
+    ALTER COLUMN "type" TYPE "PrizeTypes_new" 
+    USING (
+        CASE "type"::text
+            WHEN 'Security' THEN 'security'::text
+            WHEN 'MDR' THEN 'mdr'::text
+            WHEN 'EDR' THEN 'edr'::text
+            WHEN 'XDR' THEN 'xdr'::text
+        END::"PrizeTypes_new"
+    );
+
+-- 3. Удаляем старый тип
+DROP TYPE "PrizeTypes" CASCADE;
+
+-- 4. Переименовываем новый тип
 ALTER TYPE "PrizeTypes_new" RENAME TO "PrizeTypes";
-DROP TYPE "PrizeTypes_old";
+
 COMMIT;
