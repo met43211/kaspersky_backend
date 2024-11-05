@@ -24,6 +24,7 @@ export class SpinsService {
     await this.google.addRow([
       [...Object.values(spin.user), ...Object.values(spin.prize), formatDate(spin.date)],
     ]);
-    return prize;
+    const { amount: _, ...prizeWithNoAmount } = prize;
+    return prizeWithNoAmount;
   }
 }
