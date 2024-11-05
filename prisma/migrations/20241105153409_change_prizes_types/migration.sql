@@ -1,9 +1,14 @@
 BEGIN;
 
--- 1. Создаем новый тип перечисления с новыми значениями
-CREATE TYPE "PrizeTypes_new" AS ENUM ('security', 'mdr', 'edr', 'xdr');
+-- Step 1: Create new enum type only if it doesn't already exist
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'PrizeTypes_new') THEN
+        CREATE TYPE "PrizeTypes_new" AS ENUM ('security', 'mdr', 'edr', 'xdr');
+    END IF;
+END $$;
 
--- 2. Изменяем столбец с использованием нового типа перечисления
+-- Step 2: Alter the column to use the new enum type
 ALTER TABLE "prizes" 
     ALTER COLUMN "type" TYPE "PrizeTypes_new" 
     USING (
@@ -15,10 +20,15 @@ ALTER TABLE "prizes"
         END::"PrizeTypes_new"
     );
 
--- 3. Удаляем старый тип
-DROP TYPE "PrizeTypes" CASCADE;
+-- Step 3: Drop the old type if it exists
+DO $$ 
+BEGIN 
+    IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'PrizeTypes') THEN
+        DROP TYPE "PrizeTypes" CASCADE;
+    END IF;
+END $$;
 
--- 4. Переименовываем новый тип
+-- Step 4: Rename the new type to "PrizeTypes"
 ALTER TYPE "PrizeTypes_new" RENAME TO "PrizeTypes";
 
 COMMIT;
