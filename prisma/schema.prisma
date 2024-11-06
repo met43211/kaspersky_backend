@@ -36,8 +36,8 @@ model Prize {
 }
 
 enum PrizeTypes {
-  Security
-  MDR
-  EDR
-  XDR
+  security
+  mdr
+  edr
+  xdr
 }
